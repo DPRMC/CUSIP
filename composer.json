@@ -1,0 +1,16 @@
+{
+  "name": "dprmc/cusip",
+  "description": "A php library for validating CUSIP codes.",
+  "type": "library",
+  "require-dev": {
+    "phpunit/phpunit": "^6.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Drennen",
+      "email": "mdrennen@deerparkrd.com"
+    }
+  ],
+  "require": {}
+}
