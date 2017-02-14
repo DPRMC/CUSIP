@@ -17,6 +17,10 @@ class CUSIP {
      * @return bool
      */
     public static function isCUSIP(string $cusip) {
+
+        // Trim any whitespace from the input string.
+        $cusip = trim($cusip);
+
         // A CUSIP is always 9 characters long.
         if (strlen($cusip) != 9) {
             return false;
