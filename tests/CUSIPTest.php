@@ -8,4 +8,19 @@ class CUSIPTest extends TestCase {
         $isCusip = CUSIP::isCUSIP('');
         $this->assertFalse($isCusip);
     }
+
+    public function testInvalidInputString() {
+        $isCusip = CUSIP::isCUSIP('notValidCusip');
+        $this->assertFalse($isCusip);
+    }
+
+    public function testValidInputString() {
+        $isCusip = CUSIP::isCUSIP('222386AA2');
+        $this->assertTrue($isCusip);
+    }
+
+    public function testValidInputStringWithWhitespace() {
+        $isCusip = CUSIP::isCUSIP(' 222386AA2 ');
+        $this->assertTrue($isCusip);
+    }
 }
