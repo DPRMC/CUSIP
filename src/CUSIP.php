@@ -16,7 +16,7 @@ class CUSIP {
      * @param string $cusip The string that you want to determine is a valid CUSIP or not.
      * @return bool
      */
-    public static function isCUSIP(string $cusip) {
+    public static function isCUSIP($cusip) {
 
         // Trim any whitespace from the input string.
         $cusip = trim($cusip);
@@ -79,5 +79,20 @@ class CUSIP {
             return true;
         endif;
         return false;
+    }
+
+
+    /**
+     * @param array $cusips
+     * @return array The input array, but with invalid CUSIPs removed.
+     */
+    public static function removeInvalidCusips($cusips) {
+        $validCusips = [];
+        foreach ($cusips as $cusip):
+            if (CUSIP::isCUSIP($cusip)):
+                $validCusips[] = $cusip;
+            endif;
+        endforeach;
+        return $validCusips;
     }
 }
