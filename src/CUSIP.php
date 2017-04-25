@@ -105,6 +105,8 @@ class CUSIP {
      */
     public static function getValidCusipsFromString($string) {
         $cusips = preg_split("/[\s,]+/", $string, PREG_SPLIT_NO_EMPTY);
+        var_dump('cusips');
+        var_dump($cusips);
         if ($cusips === false) {
             return [];
         }
