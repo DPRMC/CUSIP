@@ -95,4 +95,19 @@ class CUSIP {
         endforeach;
         return $validCusips;
     }
+
+    /**
+     * Often times a Controller will accept an input string, that is a big list of CUSIPS
+     * that were copy/pasted in. Instead of munging that data in the controller, let's put
+     * it in our handy CUSIP package.
+     * @param string $string A string that might contain some cusips. In most of our use cases, it will be one CUSIP per line.
+     * @return array
+     */
+    public static function getValidCusipsFromString($string) {
+        $cusips = preg_split("/[\s,]+/", $string, PREG_SPLIT_NO_EMPTY);
+        if ($cusips === false) {
+            return [];
+        }
+        return self::removeInvalidCusips($cusips);
+    }
 }
