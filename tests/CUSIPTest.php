@@ -46,9 +46,6 @@ class CUSIPTest extends TestCase {
 ";
 
         $validCusips = CUSIP::getValidCusipsFromString($string);
-
-        var_dump($validCusips);
-
         $this->assertTrue(count($validCusips) == 4);
     }
 }
