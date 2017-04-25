@@ -25,17 +25,17 @@ class CUSIPTest extends TestCase {
     }
 
     public function testInputStringWithNewLines() {
-        $cusips = "3137A96Y7
+        $string = "3137A96Y7
 3136A45X3
 31397NCJ2
 31397JYY4";
 
-        $validCusips = CUSIP::getValidCusipsFromString($cusips);
+        $validCusips = CUSIP::getValidCusipsFromString($string);
         $this->assertTrue(count($validCusips) == 4);
     }
 
     public function testInputStringWithNewLinesAndBlankLines() {
-        $cusips = "
+        $string = "
         3137A96Y7
 3136A45X3
 
@@ -45,7 +45,10 @@ class CUSIPTest extends TestCase {
 
 ";
 
-        $validCusips = CUSIP::getValidCusipsFromString($cusips);
+        $validCusips = CUSIP::getValidCusipsFromString($string);
+
+        var_dump($validCusips);
+
         $this->assertTrue(count($validCusips) == 4);
     }
 }
