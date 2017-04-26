@@ -48,4 +48,36 @@ class CUSIPTest extends TestCase {
         $validCusips = CUSIP::getValidCusipsFromString($string);
         $this->assertTrue(count($validCusips) == 4);
     }
+
+    public function testInputStringWithNewLinesAndBlankLinesAndCommas() {
+        $string = "
+        3137A96Y7,
+,3136A45X3
+
+31397NCJ2,
+
+,31397JYY4,,,
+
+";
+
+        $validCusips = CUSIP::getValidCusipsFromString($string);
+        $this->assertTrue(count($validCusips) == 4);
+    }
+
+    /**
+     *
+     */
+    public function testInputStringWithNewLinesAndBlankLinesAndCommasAndDuplicates() {
+        $string = "
+        3137A96Y7,
+,31397NCJ2
+
+31397NCJ2,
+
+,3137A96Y7,,,
+
+";
+        $validCusips = CUSIP::getUniqueValidCusipsFromString($string);
+        $this->assertTrue(count($validCusips) == 2);
+    }
 }

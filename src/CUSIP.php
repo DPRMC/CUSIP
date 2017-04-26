@@ -104,11 +104,22 @@ class CUSIP {
      * @return array
      */
     public static function getValidCusipsFromString($string) {
-        $cusips = preg_split("/[\s,]+/", $string, PREG_SPLIT_NO_EMPTY);
-        var_dump($cusips);
+        $cusips = preg_split("/[\s,]+/", $string, -1, PREG_SPLIT_NO_EMPTY);
         if ($cusips === false) {
             return [];
         }
         return self::removeInvalidCusips($cusips);
+    }
+
+    /**
+     * @param $string
+     * @return array
+     */
+    public static function getUniqueValidCusipsFromString($string) {
+        $cusips = self::getValidCusipsFromString($string);
+        $cusips = self::removeInvalidCusips($cusips);
+        $cusips = array_unique($cusips);
+        $cusips = array_values($cusips);
+        return $cusips;
     }
 }
