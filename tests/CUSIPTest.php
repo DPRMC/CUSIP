@@ -108,9 +108,9 @@ class CUSIPTest extends TestCase {
     /**
      *
      */
-    public function testGetValidCusipsFromStringWithNoCusipsInIt() {
-        $cusipString = "This\nis\nnot\na list of\nCUSIP\nidentifiers";
-        $validCusips = CUSIP::getValidCusipsFromString( $cusipString );
-        $this->assertCount( 0, $validCusips );
+    public function testGetValidCusipsFromStringWithPregSplitFailure() {
+        $fileResourceInsteadOfString = fopen( "./LICENSE", "r" );
+        $validCusips                 = CUSIP::getValidCusipsFromString( $fileResourceInsteadOfString );
+        $this->assertEquals( 0, count( $validCusips ) );
     }
 }

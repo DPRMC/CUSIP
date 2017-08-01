@@ -10,6 +10,57 @@ namespace DPRMC;
 class CUSIP {
 
     /**
+     * @param $string
+     *
+     * @return array
+     */
+    public static function getUniqueValidCusipsFromString( $string ) {
+        $cusips = self::getValidCusipsFromString( $string );
+        $cusips = self::removeInvalidCusips( $cusips );
+        $cusips = array_unique( $cusips );
+        $cusips = array_values( $cusips );
+
+        return $cusips;
+    }
+
+    /**
+     * Often times a Controller will accept an input string, that is a big list of CUSIPS
+     * that were copy/pasted in. Instead of munging that data in the controller, let's put
+     * it in our handy CUSIP package.
+     * In the interest of testing, I suppress the error from preg_split and explicitly test for failure.
+     * This way I can be sure that my removeInvalidCusips function will receive an array.
+     * FYI, you can make preg_split fail by passing it a file resource (fopen()) instead of a string.
+     *
+     * @param string $string A string that might contain some cusips. In most of our use cases, it will be one CUSIP per line.
+     *
+     * @return array
+     */
+    public static function getValidCusipsFromString( $string ) {
+        $cusips = @preg_split( "/[\s,]+/", $string, -1, PREG_SPLIT_NO_EMPTY );
+        if ( $cusips === false ) {
+            return [];
+        }
+
+        return self::removeInvalidCusips( $cusips );
+    }
+
+    /**
+     * @param array $cusips
+     *
+     * @return array The input array, but with invalid CUSIPs removed.
+     */
+    public static function removeInvalidCusips( $cusips ) {
+        $validCusips = [];
+        foreach ( $cusips as $cusip ):
+            if ( CUSIP::isCUSIP( $cusip ) ):
+                $validCusips[] = $cusip;
+            endif;
+        endforeach;
+
+        return $validCusips;
+    }
+
+    /**
      * Determines if the given CUSIP is valid according to its checksum digit.
      * Below is the wikipedia link to the pseudocode that this function is based on.
      * https://en.wikipedia.org/wiki/CUSIP#Check_digit_pseudocode
@@ -79,47 +130,5 @@ class CUSIP {
             return true;
         endif;
         return false;
-    }
-
-
-    /**
-     * @param array $cusips
-     * @return array The input array, but with invalid CUSIPs removed.
-     */
-    public static function removeInvalidCusips($cusips) {
-        $validCusips = [];
-        foreach ($cusips as $cusip):
-            if (CUSIP::isCUSIP($cusip)):
-                $validCusips[] = $cusip;
-            endif;
-        endforeach;
-        return $validCusips;
-    }
-
-    /**
-     * Often times a Controller will accept an input string, that is a big list of CUSIPS
-     * that were copy/pasted in. Instead of munging that data in the controller, let's put
-     * it in our handy CUSIP package.
-     * @param string $string A string that might contain some cusips. In most of our use cases, it will be one CUSIP per line.
-     * @return array
-     */
-    public static function getValidCusipsFromString($string) {
-        $cusips = preg_split("/[\s,]+/", $string, -1, PREG_SPLIT_NO_EMPTY);
-        if ($cusips === false) {
-            return [];
-        }
-        return self::removeInvalidCusips($cusips);
-    }
-
-    /**
-     * @param $string
-     * @return array
-     */
-    public static function getUniqueValidCusipsFromString($string) {
-        $cusips = self::getValidCusipsFromString($string);
-        $cusips = self::removeInvalidCusips($cusips);
-        $cusips = array_unique($cusips);
-        $cusips = array_values($cusips);
-        return $cusips;
     }
 }
