@@ -17,5 +17,7 @@
       "src/"
     ]
   },
-  "require": {}
+  "require": {
+    "satooshi/php-coveralls": "^1.0"
+  }
 }

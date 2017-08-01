@@ -5,23 +5,23 @@ use DPRMC\CUSIP;
 class CUSIPTest extends TestCase {
 
     public function testEmptyInputString() {
-        $isCusip = CUSIP::isCUSIP('');
-        $this->assertFalse($isCusip);
+        $isCusip = CUSIP::isCUSIP( '' );
+        $this->assertFalse( $isCusip );
     }
 
     public function testInvalidInputString() {
-        $isCusip = CUSIP::isCUSIP('notValidCusip');
-        $this->assertFalse($isCusip);
+        $isCusip = CUSIP::isCUSIP( 'notValidCusip' );
+        $this->assertFalse( $isCusip );
     }
 
     public function testValidInputString() {
-        $isCusip = CUSIP::isCUSIP('222386AA2');
-        $this->assertTrue($isCusip);
+        $isCusip = CUSIP::isCUSIP( '222386AA2' );
+        $this->assertTrue( $isCusip );
     }
 
     public function testValidInputStringWithWhitespace() {
-        $isCusip = CUSIP::isCUSIP(' 222386AA2 ');
-        $this->assertTrue($isCusip);
+        $isCusip = CUSIP::isCUSIP( ' 222386AA2 ' );
+        $this->assertTrue( $isCusip );
     }
 
     public function testInputStringWithNewLines() {
@@ -30,8 +30,8 @@ class CUSIPTest extends TestCase {
 31397NCJ2
 31397JYY4";
 
-        $validCusips = CUSIP::getValidCusipsFromString($string);
-        $this->assertTrue(count($validCusips) == 4);
+        $validCusips = CUSIP::getValidCusipsFromString( $string );
+        $this->assertTrue( count( $validCusips ) == 4 );
     }
 
     public function testInputStringWithNewLinesAndBlankLines() {
@@ -45,8 +45,8 @@ class CUSIPTest extends TestCase {
 
 ";
 
-        $validCusips = CUSIP::getValidCusipsFromString($string);
-        $this->assertTrue(count($validCusips) == 4);
+        $validCusips = CUSIP::getValidCusipsFromString( $string );
+        $this->assertTrue( count( $validCusips ) == 4 );
     }
 
     public function testInputStringWithNewLinesAndBlankLinesAndCommas() {
@@ -60,15 +60,15 @@ class CUSIPTest extends TestCase {
 
 ";
 
-        $validCusips = CUSIP::getValidCusipsFromString($string);
-        $this->assertTrue(count($validCusips) == 4);
+        $validCusips = CUSIP::getValidCusipsFromString( $string );
+        $this->assertTrue( count( $validCusips ) == 4 );
     }
 
     /**
      *
      */
     public function testInputStringWithNewLinesAndBlankLinesAndCommasAndDuplicates() {
-        $string = "
+        $string      = "
         3137A96Y7,
 ,31397NCJ2
 
@@ -77,7 +77,7 @@ class CUSIPTest extends TestCase {
 ,3137A96Y7,,,
 
 ";
-        $validCusips = CUSIP::getUniqueValidCusipsFromString($string);
-        $this->assertTrue(count($validCusips) == 2);
+        $validCusips = CUSIP::getUniqueValidCusipsFromString( $string );
+        $this->assertTrue( count( $validCusips ) == 2 );
     }
 }
