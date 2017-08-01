@@ -80,4 +80,37 @@ class CUSIPTest extends TestCase {
         $validCusips = CUSIP::getUniqueValidCusipsFromString( $string );
         $this->assertTrue( count( $validCusips ) == 2 );
     }
+
+    public function testIsCusipWithStar() {
+        $cusip   = '00800*AA0';
+        $isCusip = CUSIP::isCUSIP( $cusip );
+        $this->assertTrue( $isCusip );
+    }
+
+    public function testIsCusipWithAmpersand() {
+        $cusip   = '00800@AA8';
+        $isCusip = CUSIP::isCUSIP( $cusip );
+        $this->assertTrue( $isCusip );
+    }
+
+    public function testIsCusipWithHash() {
+        $cusip   = '00800#AA6';
+        $isCusip = CUSIP::isCUSIP( $cusip );
+        $this->assertTrue( $isCusip );
+    }
+
+    public function testIsCusipWithInvalidCheckDigit() {
+        $cusip   = '31397JYY5';
+        $isCusip = CUSIP::isCUSIP( $cusip );
+        $this->assertFalse( $isCusip );
+    }
+
+    /**
+     *
+     */
+    public function testGetValidCusipsFromStringWithNoCusipsInIt() {
+        $cusipString = "This\nis\nnot\na list of\nCUSIP\nidentifiers";
+        $validCusips = CUSIP::getValidCusipsFromString( $cusipString );
+        $this->assertCount( 0, $validCusips );
+    }
 }
