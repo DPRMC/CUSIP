@@ -31,7 +31,8 @@ class CUSIP {
      * This way I can be sure that my removeInvalidCusips function will receive an array.
      * FYI, you can make preg_split fail by passing it a file resource (fopen()) instead of a string.
      *
-     * @param string $string A string that might contain some cusips. In most of our use cases, it will be one CUSIP per line.
+     * @param string $string A string that might contain some cusips. In most of our use cases, it will be one CUSIP
+     *                       per line.
      *
      * @return array
      */
@@ -64,71 +65,92 @@ class CUSIP {
      * Determines if the given CUSIP is valid according to its checksum digit.
      * Below is the wikipedia link to the pseudocode that this function is based on.
      * https://en.wikipedia.org/wiki/CUSIP#Check_digit_pseudocode
+     *
      * @param string $cusip The string that you want to determine is a valid CUSIP or not.
+     *
      * @return bool
      */
-    public static function isCUSIP($cusip) {
+    public static function isCUSIP( $cusip ) {
 
         // Trim any whitespace from the input string.
-        $cusip = trim($cusip);
+        $cusip = trim( $cusip );
 
         // A CUSIP is always 9 characters long.
-        if (strlen($cusip) != 9) {
+        if ( strlen( $cusip ) != 9 ) {
+            return false;
+        }
+
+        $checksumDigit = CUSIP::getChecksumDigit( $cusip );
+        // If the last character of the cusip is equal to the checksum digit, then it validates.
+        if ( substr( $cusip,
+                     -1 ) == $checksumDigit
+        ):
+            return true;
+        endif;
+
+        return false;
+    }
+
+    /**
+     * @param $cusip
+     *
+     * @return bool|int
+     */
+    public static function getChecksumDigit( $cusip ) {
+        // Trim any whitespace from the input string.
+        $cusip = trim( $cusip );
+
+        // A CUSIP is always 9 characters long.
+        if ( strlen( $cusip ) < 8 || strlen( $cusip ) > 9 ) {
             return false;
         }
         // The $sum is the running tally of values that gets some math performed on it at the
         // end that converts it into the checksum digit.
         $sum = 0;
         // Split the CUSIP into an array. One character per array element, for easy looping.
-        $chars = str_split($cusip,
-                           1);
+        $chars = str_split( $cusip,
+                            1 );
         // Loop through the first 8 characters. (The 9th character is the checksum.
-        for ($i = 0; $i < 8; $i++) {
-            $c = $chars[$i]; // Pull the next character from the array.
+        for ( $i = 0; $i < 8; $i++ ) {
+            $c = $chars[ $i ]; // Pull the next character from the array.
             // The value ($v) is the numeric value for this character.
             // The value depends on what type of character it is. The if/else statements below handle the cases.
             $v = null;
             // If the character is a digit, then we just take the integer value of it.
-            if (ctype_digit($c)):
+            if ( ctype_digit( $c ) ):
                 $v = (int)$c;
             // The next 3 elseif's are special cases.
             // The characters * @ # are all valid in a CUSIP and are given the values 36,37, and 38 respectively when validating.
-            elseif ($c == '*'):
+            elseif ( $c == '*' ):
                 $v = 36;
-            elseif ($c == '@'):
+            elseif ( $c == '@' ):
                 $v = 37;
-            elseif ($c == '#'):
+            elseif ( $c == '#' ):
                 $v = 38;
             // If the character is a letter, we force it to lowercase, so we can be sure we get a consistent value
             // from the ord() function. Example: a and A have different values according to the ord() function.
-            elseif (ctype_alpha($c)):
-                $c = strtolower($c);
-                $ord = ord($c);
+            elseif ( ctype_alpha( $c ) ):
+                $c        = strtolower( $c );
+                $ord      = ord( $c );
                 $position = $ord - 96;
-                $v = $position + 9; // S&P encodes A == 10, and so on.
+                $v        = $position + 9; // S&P encodes A == 10, and so on.
             endif;
             // Of the 8 characters we are checking, if the character being checked right now is
             // in an odd position, then we are supposed to double it's value. Example: 6 becomes 12
-            if (($i % 2) != 0):
+            if ( ( $i % 2 ) != 0 ):
                 $v *= 2;
             endif;
             // If the value ($v) is 2 digits long, then add them together. So 12 would be 1 + 2 to give you 3.
             // Then add that to the sum.
-            $vDiv10 = floor($v / 10);
-            $vMod10 = ($v % 10);
-            $sum += $vDiv10 + $vMod10;
+            $vDiv10 = floor( $v / 10 );
+            $vMod10 = ( $v % 10 );
+            $sum    += $vDiv10 + $vMod10;
         }
         // $sum = $sum + (int)( $v / 10 ) + $v % 10
         // I split it out, so people don't have to second guess the order of operations.
-        $sumMod10 = $sum % 10;
+        $sumMod10         = $sum % 10;
         $tenMinusSumMod10 = 10 - $sumMod10;
-        $checksumDigit = $tenMinusSumMod10 % 10;
-        // If the last character of the cusip is equal to the checksum digit, then it validates.
-        if (substr($cusip,
-                   -1) == $checksumDigit
-        ):
-            return true;
-        endif;
-        return false;
+
+        return $tenMinusSumMod10 % 10; // Return the checksum digit
     }
 }
