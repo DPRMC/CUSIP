@@ -2,9 +2,6 @@
   "name": "dprmc/cusip",
   "description": "A php library for validating CUSIP codes.",
   "type": "library",
-  "require-dev": {
-    "phpunit/phpunit": "^6.0"
-  },
   "license": "MIT",
   "authors": [
     {
@@ -18,6 +15,10 @@
     ]
   },
   "require": {
-    "satooshi/php-coveralls": "^1.0"
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.5",
+    "php-coveralls/php-coveralls": "^2.1"
   }
 }
