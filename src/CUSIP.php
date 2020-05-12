@@ -82,12 +82,10 @@ class CUSIP {
 
         $checksumDigit = CUSIP::getChecksumDigit( $cusip );
         // If the last character of the cusip is equal to the checksum digit, then it validates.
-        if ( substr( $cusip,
-                     -1 ) == $checksumDigit
-        ):
+        $isValid = $checksumDigit !== false && (\substr($cusip, -1) == $checksumDigit);
+        if ($isValid) {
             return true;
-        endif;
-
+        }
         return false;
     }
 
@@ -135,6 +133,10 @@ class CUSIP {
                 $position = $ord - 96;
                 $v        = $position + 9; // S&P encodes A == 10, and so on.
             endif;
+            if ($v === null) {
+                // invalid character is provided
+                return false;
+            }
             // Of the 8 characters we are checking, if the character being checked right now is
             // in an odd position, then we are supposed to double it's value. Example: 6 becomes 12
             if ( ( $i % 2 ) != 0 ):

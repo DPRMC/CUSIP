@@ -139,6 +139,16 @@ class CUSIPTest extends TestCase {
         $this->assertFalse( $isCusip );
     }
 
+
+    public function testIsCusipWithInvalidCheckInvalidCharacters() {
+        $isCusip = CUSIP::isCUSIP('1234' . \chr(0) . '6787');
+        static::assertFalse($isCusip);
+
+        $isCusip = CUSIP::isCUSIP('1234' . \chr(127) . '6787');
+        static::assertFalse($isCusip);
+    }
+
+
     /**
      * @test
      */
