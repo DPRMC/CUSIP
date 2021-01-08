@@ -10,6 +10,9 @@ namespace DPRMC;
 class CUSIP {
 
 
+    /**
+     * A CUSIP may only contain characters that pass this regex.
+     */
     const REGEX_PATTERN = "/[\dA-Z@\*\#]{9}/";
 
     /**
