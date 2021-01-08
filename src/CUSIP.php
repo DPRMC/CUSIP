@@ -9,6 +9,9 @@ namespace DPRMC;
  */
 class CUSIP {
 
+
+    const REGEX_PATTERN = "/[\dA-Z@\*\#]{9}/";
+
     /**
      * @param $string
      *
@@ -38,7 +41,7 @@ class CUSIP {
      */
     public static function getValidCusipsFromString( $string ) {
         $cusips = @preg_split( "/[\s,]+/", $string, -1, PREG_SPLIT_NO_EMPTY );
-        if ( $cusips === false ) {
+        if ( $cusips === FALSE ) {
             return [];
         }
 
@@ -77,7 +80,11 @@ class CUSIP {
 
         // A CUSIP is always 9 characters long.
         if ( strlen( $cusip ) != 9 ) {
-            return false;
+            return FALSE;
+        }
+
+        if ( TRUE === self::containsInvalidCharacters( $cusip ) ) {
+            return FALSE;
         }
 
         $checksumDigit = CUSIP::getChecksumDigit( $cusip );
@@ -85,10 +92,19 @@ class CUSIP {
         if ( substr( $cusip,
                      -1 ) == $checksumDigit
         ):
-            return true;
+            return TRUE;
         endif;
 
-        return false;
+        return FALSE;
+    }
+
+
+    public static function containsInvalidCharacters( $cusip ) {
+        $cusip = strtoupper( $cusip );
+        if ( 1 === preg_match( self::REGEX_PATTERN, $cusip ) ) {
+            return FALSE;
+        }
+        return TRUE;
     }
 
     /**
@@ -102,7 +118,7 @@ class CUSIP {
 
         // A CUSIP is always 9 characters long.
         if ( strlen( $cusip ) < 8 || strlen( $cusip ) > 9 ) {
-            return false;
+            return FALSE;
         }
         // The $sum is the running tally of values that gets some math performed on it at the
         // end that converts it into the checksum digit.
@@ -115,7 +131,7 @@ class CUSIP {
             $c = $chars[ $i ]; // Pull the next character from the array.
             // The value ($v) is the numeric value for this character.
             // The value depends on what type of character it is. The if/else statements below handle the cases.
-            $v = null;
+            $v = NULL;
             // If the character is a digit, then we just take the integer value of it.
             if ( ctype_digit( $c ) ):
                 $v = (int)$c;

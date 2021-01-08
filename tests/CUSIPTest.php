@@ -21,6 +21,15 @@ class CUSIPTest extends TestCase {
         $this->assertFalse( $isCusip );
     }
 
+
+    /**
+     * @test
+     */
+    public function testInvalidInputStringWithBadChars() {
+        $isCusip = CUSIP::isCUSIP( '12345678-' );
+        $this->assertFalse( $isCusip );
+    }
+
     /**
      * @test
      */
