@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use DPRMC\CUSIP;
+use PHPUnit\Framework\TestCase;
 
 class CUSIPTest extends TestCase {
 
@@ -20,7 +20,6 @@ class CUSIPTest extends TestCase {
         $isCusip = CUSIP::isCUSIP( 'notValidCusip' );
         $this->assertFalse( $isCusip );
     }
-
 
 
     /**
@@ -153,9 +152,9 @@ class CUSIPTest extends TestCase {
      * @test
      */
     public function testGetValidCusipsFromStringWithPregSplitFailure() {
+        $this->expectExceptionCode( 0 );
         $fileResourceInsteadOfString = fopen( "./LICENSE", "r" );
-        $validCusips                 = CUSIP::getValidCusipsFromString( $fileResourceInsteadOfString );
-        $this->assertEquals( 0, count( $validCusips ) );
+        CUSIP::getValidCusipsFromString( $fileResourceInsteadOfString );
     }
 
 
@@ -166,5 +165,27 @@ class CUSIPTest extends TestCase {
         $cusip         = '12345678987654321'; // Definitely longer than a CUSIP should be.
         $shouldBeFalse = CUSIP::getChecksumDigit( $cusip );
         $this->assertFalse( $shouldBeFalse );
+    }
+
+
+    /**
+     * @test
+     * @group sedol
+     */
+    public function testIsSedol() {
+        $sedol   = 'B000009';
+        $isSedol = CUSIP::isSEDOL( $sedol );
+        $this->assertTrue( $isSedol );
+    }
+
+
+    /**
+     * @test
+     * @group sedol
+     */
+    public function testIsNotSedol() {
+        $sedol   = 'CCCBDD4';
+        $isSedol = CUSIP::isSEDOL( $sedol );
+        $this->assertFalse( $isSedol );
     }
 }

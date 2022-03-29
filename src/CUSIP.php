@@ -15,6 +15,8 @@ class CUSIP {
      */
     const REGEX_PATTERN = "/[\dA-Z@\*\#]{9}/";
 
+    const SEDOL_WEIGHT = [ 1, 3, 1, 7, 3, 9, 1 ];
+
     /**
      * @param $string
      *
@@ -42,7 +44,7 @@ class CUSIP {
      *
      * @return array
      */
-    public static function getValidCusipsFromString( $string ) {
+    public static function getValidCusipsFromString( string $string ): array {
         $cusips = @preg_split( "/[\s,]+/", $string, -1, PREG_SPLIT_NO_EMPTY );
         if ( $cusips === FALSE ) {
             return [];
@@ -172,4 +174,32 @@ class CUSIP {
 
         return $tenMinusSumMod10 % 10; // Return the checksum digit
     }
+
+
+    /**
+     * @param $sedol
+     * @return string
+     */
+    public static function isSEDOL( $sedol ) {
+        $numRange   = range( 0, 9 );
+        $alphaRange = range( 'A', 'Z' );
+        $range      = array_merge( $numRange, $alphaRange );
+        $charValues = array_flip( $range );
+
+        $sedol = strtoupper( $sedol );
+        $chars = str_split( $sedol );
+
+        $sum = 0;
+        foreach ( $chars as $i => $char ):
+            // Vowels will never be in a SEDOL
+            if ( stripos( 'AEIOU', $char ) ):
+                return FALSE;
+            endif;
+            $sum += $charValues[ $char ] * self::SEDOL_WEIGHT[ $i ];
+        endforeach;
+
+        return 0 == $sum % 10;
+    }
+
+
 }
