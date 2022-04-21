@@ -5,6 +5,7 @@ namespace DPRMC;
 
 /**
  * Class CUSIP
+ *
  * @package DPRMC
  */
 class CUSIP {
@@ -158,13 +159,13 @@ class CUSIP {
             endif;
             // Of the 8 characters we are checking, if the character being checked right now is
             // in an odd position, then we are supposed to double it's value. Example: 6 becomes 12
-            if ( ( $i % 2 ) != 0 ):
+            if ( ($i % 2) != 0 ):
                 $v *= 2;
             endif;
             // If the value ($v) is 2 digits long, then add them together. So 12 would be 1 + 2 to give you 3.
             // Then add that to the sum.
             $vDiv10 = floor( $v / 10 );
-            $vMod10 = ( $v % 10 );
+            $vMod10 = ($v % 10);
             $sum    += $vDiv10 + $vMod10;
         }
         // $sum = $sum + (int)( $v / 10 ) + $v % 10
@@ -178,6 +179,7 @@ class CUSIP {
 
     /**
      * @param $sedol
+     *
      * @return string
      */
     public static function isSEDOL( $sedol ) {
@@ -199,6 +201,40 @@ class CUSIP {
         endforeach;
 
         return 0 == $sum % 10;
+    }
+
+
+    /**
+     * @param $isin
+     *
+     * @return bool
+     * @see       https://github.com/pear/Validate_Finance/blob/master/Validate/Finance/ISIN.php
+     * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+     */
+    public static function isISIN( $isin ) {
+        if ( !preg_match( '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/i', $isin ) ):
+            return FALSE;
+        endif;
+
+        // Convert letters to numbers.
+        $base10 = '';
+        for ( $i = 0; $i <= 11; $i++ ):
+            $base10 .= base_convert( $isin[$i], 36, 10 );
+        endfor;
+
+        // Calculate double-add-double checksum.
+        $checksum = 0;
+        $len      = strlen( $base10 ) - 1;
+        $parity   = $len % 2;
+        // Iterate over every digit, starting with the rightmost (=check digit).
+        for ( $i = $len; $i >= 0; $i-- ):
+            // Multiply every other digit by two.
+            $weighted = $base10[$i] << (($i - $parity) & 1);
+            // Sum up the weighted digit's digit sum.
+            $checksum += $weighted % 10 + (int)($weighted / 10);
+        endfor;
+
+        return !(bool)($checksum % 10);
     }
 
 

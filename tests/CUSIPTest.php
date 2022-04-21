@@ -188,4 +188,25 @@ class CUSIPTest extends TestCase {
         $isSedol = CUSIP::isSEDOL( $sedol );
         $this->assertFalse( $isSedol );
     }
+
+
+    /**
+     * @test
+     * @group isin
+     */
+    public function testIsISIN() {
+        $isin   = 'US9311421039';
+        $isISIN = CUSIP::isISIN( $isin );
+        $this->assertTrue( $isISIN );
+    }
+
+    /**
+     * @test
+     * @group isin
+     */
+    public function testIsNotISIN() {
+        $isin   = 'US9311421038';
+        $isISIN = CUSIP::isISIN( $isin );
+        $this->assertFalse( $isISIN );
+    }
 }
