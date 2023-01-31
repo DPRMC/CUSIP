@@ -75,11 +75,15 @@ class CUSIP {
      * Below is the wikipedia link to the pseudocode that this function is based on.
      * https://en.wikipedia.org/wiki/CUSIP#Check_digit_pseudocode
      *
-     * @param string $cusip The string that you want to determine is a valid CUSIP or not.
+     * @param string|null $cusip The string that you want to determine is a valid CUSIP or not.
      *
      * @return bool
      */
-    public static function isCUSIP( $cusip ) {
+    public static function isCUSIP( $cusip = NULL ) {
+
+        if ( empty( $cusip ) ):
+            return FALSE;
+        endif;
 
         // Trim any whitespace from the input string.
         $cusip = trim( $cusip );
@@ -159,13 +163,13 @@ class CUSIP {
             endif;
             // Of the 8 characters we are checking, if the character being checked right now is
             // in an odd position, then we are supposed to double it's value. Example: 6 becomes 12
-            if ( ($i % 2) != 0 ):
+            if ( ( $i % 2 ) != 0 ):
                 $v *= 2;
             endif;
             // If the value ($v) is 2 digits long, then add them together. So 12 would be 1 + 2 to give you 3.
             // Then add that to the sum.
             $vDiv10 = floor( $v / 10 );
-            $vMod10 = ($v % 10);
+            $vMod10 = ( $v % 10 );
             $sum    += $vDiv10 + $vMod10;
         }
         // $sum = $sum + (int)( $v / 10 ) + $v % 10
@@ -212,14 +216,14 @@ class CUSIP {
      * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
      */
     public static function isISIN( $isin ) {
-        if ( !preg_match( '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/i', $isin ) ):
+        if ( ! preg_match( '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/i', $isin ) ):
             return FALSE;
         endif;
 
         // Convert letters to numbers.
         $base10 = '';
         for ( $i = 0; $i <= 11; $i++ ):
-            $base10 .= base_convert( $isin[$i], 36, 10 );
+            $base10 .= base_convert( $isin[ $i ], 36, 10 );
         endfor;
 
         // Calculate double-add-double checksum.
@@ -229,12 +233,12 @@ class CUSIP {
         // Iterate over every digit, starting with the rightmost (=check digit).
         for ( $i = $len; $i >= 0; $i-- ):
             // Multiply every other digit by two.
-            $weighted = $base10[$i] << (($i - $parity) & 1);
+            $weighted = $base10[ $i ] << ( ( $i - $parity ) & 1 );
             // Sum up the weighted digit's digit sum.
-            $checksum += $weighted % 10 + (int)($weighted / 10);
+            $checksum += $weighted % 10 + (int)( $weighted / 10 );
         endfor;
 
-        return !(bool)($checksum % 10);
+        return ! (bool)( $checksum % 10 );
     }
 
 
