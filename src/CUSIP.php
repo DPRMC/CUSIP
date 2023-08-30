@@ -276,7 +276,7 @@ class CUSIP {
      */
     protected static function _replaceIO( string $CUSIP ): string {
         $CUSIP = str_replace( 'O', 0, $CUSIP );
-        $CUSIP = strrev( 'I', 1, $CUSIP );
+        $CUSIP = str_replace( 'I', 1, $CUSIP );
         return $CUSIP;
     }
 

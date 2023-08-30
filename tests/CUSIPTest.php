@@ -209,4 +209,27 @@ class CUSIPTest extends TestCase {
         $isISIN = CUSIP::isISIN( $isin );
         $this->assertFalse( $isISIN );
     }
+
+
+    /**
+     * @test
+     * @group cusip
+     */
+    public function testShouldFixCusipWithInvalidLetters() {
+        $invalidCusip = '61765XAYO'; // Uses the letter O which is not allowed.
+        $fixedCusip   = CUSIP::fixCusip( $invalidCusip );
+        $isValidCusip = CUSIP::isCUSIP( $fixedCusip );
+        $this->assertTrue( $isValidCusip );
+    }
+
+
+    /**
+     * @test
+     * @group cusip
+     */
+    public function testUnfixableCusipShouldThrowException(){
+        $this->expectException(\DPRMC\UnfixableCusipException::class);
+        $invalidCusip = 'notCUSIP'; // Uses the letter O which is not allowed.
+        CUSIP::fixCusip( $invalidCusip );
+    }
 }
