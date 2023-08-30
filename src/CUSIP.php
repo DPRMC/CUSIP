@@ -248,11 +248,17 @@ class CUSIP {
      * @throws UnfixableCusipException
      */
     public static function fixCusip( string $originalCUSIP ): string {
-        if ( self::isCUSIP( $originalCUSIP ) ):
-            return $originalCUSIP;
+
+        $cleanOriginalCUSIP = $originalCUSIP;
+        $cleanOriginalCUSIP = trim($cleanOriginalCUSIP);
+        $cleanOriginalCUSIP = strtoupper($cleanOriginalCUSIP);
+
+
+        if ( self::isCUSIP( $cleanOriginalCUSIP ) ):
+            return $cleanOriginalCUSIP;
         endif;
 
-        $fixedCUSIP = self::_replaceIO( $originalCUSIP );
+        $fixedCUSIP = self::_replaceIO( $cleanOriginalCUSIP );
 
         if ( self::isCUSIP( $fixedCUSIP ) ):
             return $fixedCUSIP;
