@@ -242,4 +242,37 @@ class CUSIP {
     }
 
 
+    /**
+     * @param string $originalCUSIP
+     * @return string
+     * @throws UnfixableCusipException
+     */
+    public static function fixCusip( string $originalCUSIP ): string {
+        if ( self::isCUSIP( $originalCUSIP ) ):
+            return $originalCUSIP;
+        endif;
+
+        $fixedCUSIP = self::_replaceIO( $originalCUSIP );
+
+        if ( self::isCUSIP( $fixedCUSIP ) ):
+            return $fixedCUSIP;
+        endif;
+
+        throw new UnfixableCusipException( "I am unable to fix this CUSIP to make it valid.", 0, NULL, $originalCUSIP );
+    }
+
+
+    /**
+     * "To avoid confusion, the letters I and O are not used since they might be mistaken for the digits 1 and 0."
+     * @url https://en.wikipedia.org/wiki/CUSIP#:~:text=A%20CUSIP%20(%2F%CB%88kj,clearing%20and%20settlement%20of%20trades.
+     * @param string $CUSIP
+     * @return string
+     */
+    protected static function _replaceIO( string $CUSIP ): string {
+        $CUSIP = str_replace( 'O', 0, $CUSIP );
+        $CUSIP = strrev( 'I', 1, $CUSIP );
+        return $CUSIP;
+    }
+
+
 }
