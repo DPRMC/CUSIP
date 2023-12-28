@@ -187,6 +187,10 @@ class CUSIP {
      * @return string
      */
     public static function isSEDOL( $sedol ) {
+        if ( 7 != strlen( $sedol ) ):
+            return FALSE;
+        endif;
+
         $numRange   = range( 0, 9 );
         $alphaRange = range( 'A', 'Z' );
         $range      = array_merge( $numRange, $alphaRange );
@@ -250,8 +254,8 @@ class CUSIP {
     public static function fixCusip( string $originalCUSIP ): string {
 
         $cleanOriginalCUSIP = $originalCUSIP;
-        $cleanOriginalCUSIP = trim($cleanOriginalCUSIP);
-        $cleanOriginalCUSIP = strtoupper($cleanOriginalCUSIP);
+        $cleanOriginalCUSIP = trim( $cleanOriginalCUSIP );
+        $cleanOriginalCUSIP = strtoupper( $cleanOriginalCUSIP );
 
 
         if ( self::isCUSIP( $cleanOriginalCUSIP ) ):
