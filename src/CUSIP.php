@@ -273,6 +273,27 @@ class CUSIP {
 
 
     /**
+     * @param string $symbol
+     * @return string Ex: CUSIP, ISIN, or SEDOL
+     * @throws UnknownSymbolException If the symbol isn't a recognized format.
+     */
+    public static function getSymbolType( string $symbol ): string {
+        if ( CUSIP::isCUSIP( $symbol ) ):
+            return 'CUSIP';
+        elseif ( CUSIP::isISIN( $symbol ) ):
+            return 'ISIN';
+        elseif ( CUSIP::isSEDOL( $symbol ) ):
+            return 'SEDOL';
+        else:
+            throw new UnknownSymbolException( "Unable to determine what type of symbol is being passed in.",
+                                              0,
+                                              NULL,
+                                              $symbol );
+        endif;
+    }
+
+
+    /**
      * "To avoid confusion, the letters I and O are not used since they might be mistaken for the digits 1 and 0."
      * @url https://en.wikipedia.org/wiki/CUSIP#:~:text=A%20CUSIP%20(%2F%CB%88kj,clearing%20and%20settlement%20of%20trades.
      * @param string $CUSIP
