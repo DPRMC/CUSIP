@@ -19,6 +19,13 @@ class CUSIP {
     const SEDOL_WEIGHT = [ 1, 3, 1, 7, 3, 9, 1 ];
 
     /**
+     * @var array|string[] These are technically valid CUSIPs, but not assigned and are causing issues in parsers that rely on this library.
+     */
+    public static array $cusipsToIgnore = [
+        '240000000',
+    ];
+
+    /**
      * @param $string
      *
      * @return array
@@ -94,6 +101,10 @@ class CUSIP {
         }
 
         if ( TRUE === self::containsInvalidCharacters( $cusip ) ) {
+            return FALSE;
+        }
+
+        if ( in_array( $cusip, self::$cusipsToIgnore ) ) {
             return FALSE;
         }
 
