@@ -23,6 +23,7 @@ class CUSIP {
      */
     public static array $cusipsToIgnore = [
         '240000000',
+        '111322608',
     ];
 
     /**
