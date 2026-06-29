@@ -174,6 +174,7 @@ class CUSIPTest extends TestCase {
      */
     public function testIsSedol() {
         $sedol   = 'B000009';
+        $sedol   = '7TT6737';
         $isSedol = CUSIP::isSEDOL( $sedol );
         $this->assertTrue( $isSedol );
     }
