@@ -19,6 +19,14 @@ class CUSIP {
     const SEDOL_WEIGHT = [ 1, 3, 1, 7, 3, 9, 1 ];
 
     /**
+     * @var array|string[] These are technically valid CUSIPs, but not assigned and are causing issues in parsers that rely on this library.
+     */
+    public static array $cusipsToIgnore = [
+        '240000000',
+        '111322608',
+    ];
+
+    /**
      * @param $string
      *
      * @return array
@@ -75,11 +83,15 @@ class CUSIP {
      * Below is the wikipedia link to the pseudocode that this function is based on.
      * https://en.wikipedia.org/wiki/CUSIP#Check_digit_pseudocode
      *
-     * @param string $cusip The string that you want to determine is a valid CUSIP or not.
+     * @param string|null $cusip The string that you want to determine is a valid CUSIP or not.
      *
      * @return bool
      */
-    public static function isCUSIP( $cusip ) {
+    public static function isCUSIP( $cusip = NULL ) {
+
+        if ( empty( $cusip ) ):
+            return FALSE;
+        endif;
 
         // Trim any whitespace from the input string.
         $cusip = trim( $cusip );
@@ -90,6 +102,10 @@ class CUSIP {
         }
 
         if ( TRUE === self::containsInvalidCharacters( $cusip ) ) {
+            return FALSE;
+        }
+
+        if ( in_array( $cusip, self::$cusipsToIgnore ) ) {
             return FALSE;
         }
 
@@ -159,13 +175,13 @@ class CUSIP {
             endif;
             // Of the 8 characters we are checking, if the character being checked right now is
             // in an odd position, then we are supposed to double it's value. Example: 6 becomes 12
-            if ( ($i % 2) != 0 ):
+            if ( ( $i % 2 ) != 0 ):
                 $v *= 2;
             endif;
             // If the value ($v) is 2 digits long, then add them together. So 12 would be 1 + 2 to give you 3.
             // Then add that to the sum.
             $vDiv10 = floor( $v / 10 );
-            $vMod10 = ($v % 10);
+            $vMod10 = ( $v % 10 );
             $sum    += $vDiv10 + $vMod10;
         }
         // $sum = $sum + (int)( $v / 10 ) + $v % 10
@@ -183,6 +199,10 @@ class CUSIP {
      * @return string
      */
     public static function isSEDOL( $sedol ) {
+        if ( 7 != strlen( $sedol ) ):
+            return FALSE;
+        endif;
+
         $numRange   = range( 0, 9 );
         $alphaRange = range( 'A', 'Z' );
         $range      = array_merge( $numRange, $alphaRange );
@@ -212,14 +232,14 @@ class CUSIP {
      * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
      */
     public static function isISIN( $isin ) {
-        if ( !preg_match( '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/i', $isin ) ):
+        if ( ! preg_match( '/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/i', $isin ) ):
             return FALSE;
         endif;
 
         // Convert letters to numbers.
         $base10 = '';
         for ( $i = 0; $i <= 11; $i++ ):
-            $base10 .= base_convert( $isin[$i], 36, 10 );
+            $base10 .= base_convert( $isin[ $i ], 36, 10 );
         endfor;
 
         // Calculate double-add-double checksum.
@@ -229,12 +249,72 @@ class CUSIP {
         // Iterate over every digit, starting with the rightmost (=check digit).
         for ( $i = $len; $i >= 0; $i-- ):
             // Multiply every other digit by two.
-            $weighted = $base10[$i] << (($i - $parity) & 1);
+            $weighted = $base10[ $i ] << ( ( $i - $parity ) & 1 );
             // Sum up the weighted digit's digit sum.
-            $checksum += $weighted % 10 + (int)($weighted / 10);
+            $checksum += $weighted % 10 + (int)( $weighted / 10 );
         endfor;
 
-        return !(bool)($checksum % 10);
+        return ! (bool)( $checksum % 10 );
+    }
+
+
+    /**
+     * @param string $originalCUSIP
+     * @return string
+     * @throws UnfixableCusipException
+     */
+    public static function fixCusip( string $originalCUSIP ): string {
+
+        $cleanOriginalCUSIP = $originalCUSIP;
+        $cleanOriginalCUSIP = trim( $cleanOriginalCUSIP );
+        $cleanOriginalCUSIP = strtoupper( $cleanOriginalCUSIP );
+
+
+        if ( self::isCUSIP( $cleanOriginalCUSIP ) ):
+            return $cleanOriginalCUSIP;
+        endif;
+
+        $fixedCUSIP = self::_replaceIO( $cleanOriginalCUSIP );
+
+        if ( self::isCUSIP( $fixedCUSIP ) ):
+            return $fixedCUSIP;
+        endif;
+
+        throw new UnfixableCusipException( "I am unable to fix this CUSIP to make it valid.", 0, NULL, $originalCUSIP );
+    }
+
+
+    /**
+     * @param string $symbol
+     * @return string Ex: CUSIP, ISIN, or SEDOL
+     * @throws UnknownSymbolException If the symbol isn't a recognized format.
+     */
+    public static function getSymbolType( string $symbol ): string {
+        if ( CUSIP::isCUSIP( $symbol ) ):
+            return 'CUSIP';
+        elseif ( CUSIP::isISIN( $symbol ) ):
+            return 'ISIN';
+        elseif ( CUSIP::isSEDOL( $symbol ) ):
+            return 'SEDOL';
+        else:
+            throw new UnknownSymbolException( "Unable to determine what type of symbol is being passed in.",
+                                              0,
+                                              NULL,
+                                              $symbol );
+        endif;
+    }
+
+
+    /**
+     * "To avoid confusion, the letters I and O are not used since they might be mistaken for the digits 1 and 0."
+     * @url https://en.wikipedia.org/wiki/CUSIP#:~:text=A%20CUSIP%20(%2F%CB%88kj,clearing%20and%20settlement%20of%20trades.
+     * @param string $CUSIP
+     * @return string
+     */
+    protected static function _replaceIO( string $CUSIP ): string {
+        $CUSIP = str_replace( 'O', 0, $CUSIP );
+        $CUSIP = str_replace( 'I', 1, $CUSIP );
+        return $CUSIP;
     }
 
 
